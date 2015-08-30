@@ -17,7 +17,11 @@ namespace NLogViewer.Controllers
             using (MiniProfiler.Current.Step("Getting logs from database"))
             using (var conn = CreateProfiledDbConnection())
             {
-                model.Logs.AddRange(await conn.QueryAsync<Log>(DapperQueries.GetTop100Logs));
+                model.Logs.AddRange(
+                    await conn
+                        .QueryAsync<Log>(DapperQueries.GetTop100Logs)
+                        .ConfigureAwait(false)
+                    );
             }
 
             model.SelectedLogDatabase = GetSelectedConnectionStringName();
@@ -36,6 +40,7 @@ namespace NLogViewer.Controllers
             if (IsConnectionStringInWebConfig(model.SelectedLogDatabase))
             {
                 SetConnectionStringCookie(model.SelectedLogDatabase);
+
                 return RedirectToAction("Index");
             }
 
@@ -49,7 +54,9 @@ namespace NLogViewer.Controllers
             using (MiniProfiler.Current.Step("Truncating logs in database"))
             using (var conn = CreateProfiledDbConnection())
             {
-                await conn.ExecuteAsync(DapperQueries.TruncateLogs);
+                await conn
+                    .ExecuteAsync(DapperQueries.TruncateLogs)
+                    .ConfigureAwait(false);
             }
 
             return RedirectToAction("Index", "Home");

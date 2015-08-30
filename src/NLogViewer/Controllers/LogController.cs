@@ -17,7 +17,11 @@ namespace NLogViewer.Controllers
             using (MiniProfiler.Current.Step("Getting log details from database"))
             using (var conn = CreateProfiledDbConnection())
             {
-                model.Log = (await conn.QueryAsync<Log>(DapperQueries.GetLog, new { Id = id }))
+                model.Log = (
+                    await conn
+                        .QueryAsync<Log>(DapperQueries.GetLog, new { Id = id })
+                        .ConfigureAwait(false)
+                    )
                     .SingleOrDefault();
             }
 
