@@ -20,7 +20,6 @@ namespace NLogViewer.Controllers
                 model.Log = (
                     await conn
                         .QueryAsync<Log>(DapperQueries.GetLog, new { Id = id })
-                        .ConfigureAwait(false)
                     )
                     .SingleOrDefault();
             }

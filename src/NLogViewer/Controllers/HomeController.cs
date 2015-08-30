@@ -20,7 +20,6 @@ namespace NLogViewer.Controllers
                 model.Logs.AddRange(
                     await conn
                         .QueryAsync<Log>(DapperQueries.GetTop100Logs)
-                        .ConfigureAwait(false)
                     );
             }
 
@@ -54,9 +53,7 @@ namespace NLogViewer.Controllers
             using (MiniProfiler.Current.Step("Truncating logs in database"))
             using (var conn = CreateProfiledDbConnection())
             {
-                await conn
-                    .ExecuteAsync(DapperQueries.TruncateLogs)
-                    .ConfigureAwait(false);
+                await conn.ExecuteAsync(DapperQueries.TruncateLogs);
             }
 
             return RedirectToAction("Index", "Home");
