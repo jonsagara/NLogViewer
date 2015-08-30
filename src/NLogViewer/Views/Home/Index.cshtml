@@ -1,31 +1,82 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿@model NLogViewer.Models.HomeIndexModel
+@{
+    ViewBag.Title = "Home";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+<div class="row-fluid">
+    <div class="span6">
+        @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { id = "change-database-form", @class = "form-inline", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            <fieldset class="fieldset">
+                <legend>Change Database</legend>
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.SelectedLogDatabase, Model.LogDatabases, new { @class = "form-control" })
+                    <button id="btn-change-database" class="btn btn-primary">Change</button>
+                </div>
+            </fieldset>
+        }
+    </div>
+    <div class="span6">
+        @using (Html.BeginForm("TruncateLogs", "Home", FormMethod.Post, new { id = "truncate-logs-form", @class = "form-inline", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            <fieldset class="fieldset">
+                <legend>Truncate Logs in @Model.SelectedLogDatabaseName</legend>
+                <div class="form-group">
+                    <button id="btn-truncate-logs" class="btn btn-default">Truncate Logs</button>
+                </div>
+            </fieldset>
+        }
+    </div>
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
+<div>
+    @if (Model.Logs.Count > 0)
+    {
+        <h3>Last @Model.Logs.Count Logs</h3>
+
+        <table id="log-entries">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Date</th>
+                    <th>Level</th>
+                    <th>Logger</th>
+                    <th>Message</th>
+                    <th>Exception</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model.Logs)
+                {
+                    <tr>
+                        <td class="log-id">@Html.ActionLink(@log.Id.ToString(), "Detail", "Log", new { id = log.Id }, null)</td>
+                        <td class="log-date">@log.DateUtc</td>
+                        <td class="log-level">@log.Level</td>
+                        <td title="@log.Logger">@log.ShortenedLogger</td>
+                        <td>@log.Message</td>
+                        <td>@log.Exception</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <h3>There are no logs to display. Hurray!</h3>
+    }
 </div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $("#truncate-logs-form").submit(function(evt) {
+                if (!confirm("Really truncate logs?!?")) {
+                    evt.preventDefault();
+                }
+            });
+        });
+    </script>
+}

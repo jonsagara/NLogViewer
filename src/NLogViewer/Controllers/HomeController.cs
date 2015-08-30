@@ -1,30 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Dapper;
+using NLogViewer.Models;
+using StackExchange.Profiling;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
+using NLogViewer.Extensions;
 
 namespace NLogViewer.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         public ActionResult Index()
         {
-            return View();
-        }
+            var model = new HomeIndexModel();
+            var profiler = MiniProfiler.Current;
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
+            using (profiler.Step("Getting logs from database"))
+            using (var sqlConn = CreateProfiledDbConnection())
+            {
+                model.Logs.AddRange(sqlConn.Query<Log>(DapperQueries.HomeIndexTop100Logs));
+            }
 
-            return View();
-        }
+            model.SelectedLogDatabase = GetSelectedConnectionStringName();
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
+            var dbConnStrings = LogDatabaseConnectionStrings
+                .Select(css => new SelectListItem { Text = css.Name.ToFriendlyLogDatabaseName(), Value = css.Name });
+            model.LogDatabases.AddRange(dbConnStrings);
 
-            return View();
+            return View(model);
         }
     }
 }
