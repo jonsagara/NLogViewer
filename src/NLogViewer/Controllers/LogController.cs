@@ -13,9 +13,8 @@ namespace NLogViewer.Controllers
         public async Task<ActionResult> Detail(int id)
         {
             var model = new LogDetailModel { LogDatabaseName = GetSelectedConnectionStringName().ToFriendlyLogDatabaseName() };
-            var profiler = MiniProfiler.Current;
 
-            using (profiler.Step("Getting log details from database"))
+            using (MiniProfiler.Current.Step("Getting log details from database"))
             using (var conn = CreateProfiledDbConnection())
             {
                 model.Log = (await conn.QueryAsync<Log>(DapperQueries.GetLog, new { Id = id }))

@@ -13,9 +13,8 @@ namespace NLogViewer.Controllers
         public async Task<ActionResult> Index()
         {
             var model = new HomeIndexModel();
-            var profiler = MiniProfiler.Current;
 
-            using (profiler.Step("Getting logs from database"))
+            using (MiniProfiler.Current.Step("Getting logs from database"))
             using (var conn = CreateProfiledDbConnection())
             {
                 model.Logs.AddRange(await conn.QueryAsync<Log>(DapperQueries.GetTop100Logs));
@@ -47,9 +46,7 @@ namespace NLogViewer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> TruncateLogs()
         {
-            var profiler = MiniProfiler.Current;
-
-            using (profiler.Step("Truncating logs in database"))
+            using (MiniProfiler.Current.Step("Truncating logs in database"))
             using (var conn = CreateProfiledDbConnection())
             {
                 await conn.ExecuteAsync(DapperQueries.TruncateLogs);
