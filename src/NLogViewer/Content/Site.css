@@ -51,3 +51,9 @@ textarea {
 .log-level {
     width: 70px;
 }
+
+/* Log detail page */
+.message-header em {
+    word-wrap: break-word;
+    word-break: break-all;
+}
