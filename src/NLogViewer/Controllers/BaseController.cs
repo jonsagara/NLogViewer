@@ -92,7 +92,7 @@ namespace NLogViewer.Controllers
         {
             if (LogDatabaseConnectionStrings.Count == 0)
             {
-                throw new Exception("There are no configured log4net database connection strings in Web.config.");
+                throw new Exception("There are no configured NLog database connection strings in Web.config.");
             }
 
             var connStrName = GetConnectionStringNameFromCookie();
