@@ -17,7 +17,7 @@ namespace NLogViewer.Controllers
             using (profiler.Step("Getting logs from database"))
             using (var sqlConn = CreateProfiledDbConnection())
             {
-                model.Logs.AddRange(sqlConn.Query<Log>(DapperQueries.HomeIndexTop100Logs));
+                model.Logs.AddRange(sqlConn.Query<Log>(DapperQueries.GetTop100Logs));
             }
 
             model.SelectedLogDatabase = GetSelectedConnectionStringName();
@@ -27,6 +27,34 @@ namespace NLogViewer.Controllers
             model.LogDatabases.AddRange(dbConnStrings);
 
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Index(HomeIndexModel model)
+        {
+            if (IsConnectionStringInWebConfig(model.SelectedLogDatabase))
+            {
+                SetConnectionStringCookie(model.SelectedLogDatabase);
+                return RedirectToAction("Index");
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult TruncateLogs()
+        {
+            var profiler = MiniProfiler.Current;
+
+            using (profiler.Step("Truncating logs in database"))
+            using (var sqlConn = CreateProfiledDbConnection())
+            {
+                sqlConn.Execute(DapperQueries.TruncateLogs);
+            }
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }

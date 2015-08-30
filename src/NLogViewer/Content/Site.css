@@ -22,3 +22,32 @@ select,
 textarea {
     max-width: 280px;
 }
+
+/* Reset the margins so that they stretch almost to the left and right edges */
+.container {
+    width: 100%;
+}
+
+/* Log entries table */
+#log-entries {
+    width: 100%;
+}
+
+#log-entries td.break-long-words {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.log-id {
+    text-align: right;
+    vertical-align: top;
+}
+
+.log-date {
+    width: 170px;
+    text-align: right;
+}
+
+.log-level {
+    width: 70px;
+}

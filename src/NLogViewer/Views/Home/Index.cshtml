@@ -3,8 +3,8 @@
     ViewBag.Title = "Home";
 }
 
-<div class="row-fluid">
-    <div class="span6">
+<div class="row">
+    <div class="col-md-6">
         @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { id = "change-database-form", @class = "form-inline", role = "form" }))
         {
             @Html.AntiForgeryToken()
@@ -17,7 +17,7 @@
             </fieldset>
         }
     </div>
-    <div class="span6">
+    <div class="col-md-6">
         @using (Html.BeginForm("TruncateLogs", "Home", FormMethod.Post, new { id = "truncate-logs-form", @class = "form-inline", role = "form" }))
         {
             @Html.AntiForgeryToken()
@@ -31,41 +31,43 @@
     </div>
 </div>
 
-<div>
-    @if (Model.Logs.Count > 0)
-    {
-        <h3>Last @Model.Logs.Count Logs</h3>
+<div class="row">
+    <div class="col-md-12">
+        @if (Model.Logs.Count > 0)
+        {
+            <h3>Last @Model.Logs.Count Logs</h3>
 
-        <table id="log-entries">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Date</th>
-                    <th>Level</th>
-                    <th>Logger</th>
-                    <th>Message</th>
-                    <th>Exception</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var log in Model.Logs)
-                {
+            <table id="log-entries" class="table table-bordered table-condensed table-striped">
+                <thead>
                     <tr>
-                        <td class="log-id">@Html.ActionLink(@log.Id.ToString(), "Detail", "Log", new { id = log.Id }, null)</td>
-                        <td class="log-date">@log.DateUtc</td>
-                        <td class="log-level">@log.Level</td>
-                        <td title="@log.Logger">@log.ShortenedLogger</td>
-                        <td>@log.Message</td>
-                        <td>@log.Exception</td>
+                        <th>Id</th>
+                        <th>Date</th>
+                        <th>Level</th>
+                        <th>Logger</th>
+                        <th>Message</th>
+                        <th>Exception</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <h3>There are no logs to display. Hurray!</h3>
-    }
+                </thead>
+                <tbody>
+                    @foreach (var log in Model.Logs)
+                    {
+                        <tr>
+                            <td class="log-id">@Html.ActionLink(@log.Id.ToString(), "Detail", "Log", new { id = log.Id }, null)</td>
+                            <td class="log-date">@log.DateUtc</td>
+                            <td class="log-level">@log.Level</td>
+                            <td title="@log.Logger">@log.ShortenedLogger</td>
+                            <td class="break-long-words">@log.Message</td>
+                            <td class="break-long-words">@log.Exception</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <h3>There are no logs to display. Hurray!</h3>
+        }
+    </div>
 </div>
 
 @section scripts
