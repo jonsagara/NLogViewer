@@ -119,12 +119,7 @@ namespace NLogViewer.Controllers
         {
             var cookie = Request.Cookies[LogDatabaseCookieName];
 
-            if (cookie == null)
-            {
-                return null;
-            }
-
-            if (string.IsNullOrWhiteSpace(cookie.Value))
+            if (string.IsNullOrWhiteSpace(cookie?.Value))
             {
                 return null;
             }

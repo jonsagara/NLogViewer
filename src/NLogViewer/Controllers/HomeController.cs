@@ -2,6 +2,7 @@
 using NLogViewer.Models;
 using StackExchange.Profiling;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using NLogViewer.Extensions;
 
@@ -9,15 +10,15 @@ namespace NLogViewer.Controllers
 {
     public class HomeController : BaseController
     {
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             var model = new HomeIndexModel();
             var profiler = MiniProfiler.Current;
 
             using (profiler.Step("Getting logs from database"))
-            using (var sqlConn = CreateProfiledDbConnection())
+            using (var conn = CreateProfiledDbConnection())
             {
-                model.Logs.AddRange(sqlConn.Query<Log>(DapperQueries.GetTop100Logs));
+                model.Logs.AddRange(await conn.QueryAsync<Log>(DapperQueries.GetTop100Logs));
             }
 
             model.SelectedLogDatabase = GetSelectedConnectionStringName();
@@ -44,14 +45,14 @@ namespace NLogViewer.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult TruncateLogs()
+        public async Task<ActionResult> TruncateLogs()
         {
             var profiler = MiniProfiler.Current;
 
             using (profiler.Step("Truncating logs in database"))
-            using (var sqlConn = CreateProfiledDbConnection())
+            using (var conn = CreateProfiledDbConnection())
             {
-                sqlConn.Execute(DapperQueries.TruncateLogs);
+                await conn.ExecuteAsync(DapperQueries.TruncateLogs);
             }
 
             return RedirectToAction("Index", "Home");
